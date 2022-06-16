@@ -72,7 +72,92 @@ router.get("/allBalance", function (req, res, next) {
     }
   });
 });
+router.get("/CalenderFilterTransactions/:userId", function (req, res, next) {
+  transaction.find(
+    {
+      userId: req.params.userId,
+    },
+    function (err, result) {
+      if (err) {
+        res.send(err);
+      } else {
+        let credit = 0;
+        let debit = 0;
+        let lend = 0;
+        let investment = 0;
+        let lendRecovered = 0;
+        let response = [];
+        result.forEach((item) => {
+          if (req.headers.type === "daily") {
+            console.log("daily");
+            if (
+              item.Date.split("/")[0] == req.headers.date &&
+              item.Date.split("/")[1] == req.headers.month &&
+              item.Date.split("/")[2] == req.headers.year
+            ) {
+              if (item.Type == "Credit") {
+                credit += item.Amount;
+              } else if (item.Type == "Debit") {
+                debit += item.Amount;
+              } else if (item.Type == "Lend") {
+                lend += item.Amount;
+              } else if (item.Type == "Investment") {
+                investment += item.Amount;
+              } else if (item.Type == "Lend Recovered") {
+                lendRecovered += item.Amount;
+              }
+              response.push(item);
+            }
+          } else if (req.headers.type === "monthly") {
+            console.log("monthly");
+            if (
+              item.Date.split("/")[1] == req.headers.month &&
+              item.Date.split("/")[2] == req.headers.year
+            ) {
+              if (item.Type == "Credit") {
+                credit += item.Amount;
+              } else if (item.Type == "Debit") {
+                debit += item.Amount;
+              } else if (item.Type == "Lend") {
+                lend += item.Amount;
+              } else if (item.Type == "Investment") {
+                investment += item.Amount;
+              } else if (item.Type == "Lend Recovered") {
+                lendRecovered += item.Amount;
+              }
+              response.push(item);
+            }
+          } else if (req.headers.type === "yearly") {
+            if (item.Date.split("/")[2] == req.headers.year) {
+              if (item.Type == "Credit") {
+                credit += item.Amount;
+              } else if (item.Type == "Debit") {
+                debit += item.Amount;
+              } else if (item.Type == "Lend") {
+                lend += item.Amount;
+              } else if (item.Type == "Investment") {
+                investment += item.Amount;
+              } else if (item.Type == "Lend Recovered") {
+                lendRecovered += item.Amount;
+              }
+              response.push(item);
+            }
+          }
+        });
 
+        res.json({
+          success: true,
+          credit: credit,
+          debit: debit,
+          lend: lend,
+          investment: investment,
+          lendRecovered: lendRecovered,
+          response: response,
+        });
+      }
+    }
+  );
+});
 router.post("/moneyStat/account/update", function (req, res, next) {
   MoneyStats.create(
     {
