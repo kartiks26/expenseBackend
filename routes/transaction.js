@@ -286,6 +286,7 @@ function deleteTransactionAndRemoveFromAccount(req, res, next) {
     .findOne({
       id: req.params.id,
     })
+    // commenting
     .then((result) => {
       if (result.Type == "Debit") {
         MoneyStats.findOneAndUpdate(
